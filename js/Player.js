@@ -1,21 +1,50 @@
-/*global jQuery */
+/*global jQuery, window, dust, console */
 
-(function () {
+(function ($) {
 	'use strict';
 
 	var SixQuiPrend = window.SixQuiPrend = window.SixQuiPrend || {};
 
 	SixQuiPrend.Player = function (conf) {
-		this.conf = jQuery.extend({
-			cards: null,
-			index: null
+		this.conf = $.extend({
+			cards:   null,
+			index:   null,
+      type:    'IA',
+      display: true
 		}, conf || {});
 
 		this.init();
 	};
 
 	SixQuiPrend.Player.prototype.init = function () {
+    var i,
+      output;
+
 		this.score = 0;
+    this.cards = [];
+
+    this.templates = {
+      player: 'player',
+      cards:  'cards',
+      card:   'card'
+    };
+
+    for (i = 0; i < this.conf.cards.length; i += 1) {
+      this.cards.push({
+        value: this.conf.cards[i],
+        weight: this.conf.deck.getCardValue(this.conf.cards[i])
+      });
+    }
+
+    if (this.conf.display) {
+      output = dust.render(this.templates.player, {
+        name: 'User #' + this.conf.index,
+        type: this.conf.type,
+        cards: this.cards
+      }, function (err, out) {
+        $('#players').append(out);
+      });
+    }
 	};
 
 	SixQuiPrend.Player.prototype.getCard = function () {
@@ -38,4 +67,4 @@
 	SixQuiPrend.Player.prototype.getScore = function () {
 		return this.score;
 	};
-}());
+}(jQuery));

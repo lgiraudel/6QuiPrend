@@ -1,12 +1,14 @@
-/*global jQuery */
+/*global jQuery, window, console, dust */
 
-(function () {
+(function ($) {
 	'use strict';
 
-	var SixQuiPrend = window.SixQuiPrend = window.SixQuiPrend || {};
+	var SixQuiPrend = window.SixQuiPrend = window.SixQuiPrend || {},
+    game,
+    i;
 
 	SixQuiPrend.Game = function (conf) {
-		this.conf = jQuery.extend({
+		this.conf = $.extend({
 			nbPlayers:            4,
 			nbCardsForEachPlayer: 10,
 			nbRowsOnBoard:        5
@@ -16,14 +18,24 @@
 	};
 
 	SixQuiPrend.Game.prototype.init = function () {
-		this.deck = new SixQuiPrend.Deck();
-		this.players = new Array(this.conf.nbPlayers);
+    var i;
 
-		for (var i = 0; i < this.conf.nbPlayers; i++) {
+    // Templates iniitialization
+    dust.loadSource(dust.compile($('#player-tmpl').html(), 'player'));
+    dust.loadSource(dust.compile($('#cards-tmpl').html(), 'cards'));
+    dust.loadSource(dust.compile($('#card-tmpl').html(), 'card'));
+
+		this.deck = new SixQuiPrend.Deck();
+		this.players = [];
+    this.players.length = this.conf.nbPlayers;
+
+		for (i = 0; i < this.conf.nbPlayers; i += 1) {
 			this.players[i] = new SixQuiPrend.Player({
-				cards: this.deck.getCards(this.conf.nbCardsForEachPlayer),
-				index: i,
-				deck:  this.deck
+				cards:   this.deck.getCards(this.conf.nbCardsForEachPlayer),
+				index:   i,
+				deck:    this.deck,
+        type:    i === 0 ? 'Human' : 'IA',
+        display: true
 			});
 		}
 		this.board = new SixQuiPrend.Board({
@@ -36,34 +48,39 @@
 	};
 
 	SixQuiPrend.Game.prototype.showScore = function () {
-		var cellMaxLength = (this.conf.nbPlayers + '').length + 1,
+		var cellMaxLength = String(this.conf.nbPlayers).length + 1,
 			score = null,
 			line1 = '',
-			line2 = '';
+			line2 = '',
+      i,
+      j,
+      currentPlayerIndexLength,
+      currentPlayerScore,
+      currentPlayerScoreLength;
 
-		for (var i = 0; i < this.conf.nbPlayers; i++) {
+		for (i = 0; i < this.conf.nbPlayers; i += 1) {
 			score = this.players[i].getScore();
 
-			cellMaxLength = Math.max(cellMaxLength, (score + '').length);
+			cellMaxLength = Math.max(cellMaxLength, String(score).length);
 		}
 
 		line1 = 'Player';
 		line2 = 'Score ';
 
-		for (var i = 0; i < this.conf.nbPlayers; i++) {
-			var currentPlayerIndexLength = ('#' + i).length;
-			var currentPlayerScore = this.players[i].getScore();
-			var currentPlayerScoreLength = (currentPlayerScore + '').length;
+		for (i = 0; i < this.conf.nbPlayers; i += 1) {
+			currentPlayerIndexLength = ('#' + i).length;
+			currentPlayerScore = this.players[i].getScore();
+			currentPlayerScoreLength = String(currentPlayerScore).length;
 
 			line1 += ' | ';
 			line2 += ' | ';
 
-			for (var j = 0; j < cellMaxLength - currentPlayerIndexLength; j++) {
+			for (j = 0; j < cellMaxLength - currentPlayerIndexLength; j += 1) {
 				line1 += ' ';
 			}
 			line1 += '#' + i;
 
-			for (var j = 0; j < cellMaxLength - currentPlayerScoreLength; j++) {
+			for (j = 0; j < cellMaxLength - currentPlayerScoreLength; j += 1) {
 				line2 += ' ';
 			}
 			line2 += currentPlayerScore;
@@ -76,17 +93,21 @@
 	};
 
 	SixQuiPrend.Game.prototype.step = function () {
-		console.log('====== NEW STEP ======');
-		var cards = [];
+    var cards = [],
+      i,
+      min,
+      ownerIndex;
 
-		for (var i = 0; i < this.players.length; i++) {
+		console.log('====== NEW STEP ======');
+
+		for (i = 0; i < this.players.length; i += 1) {
 			cards.push(this.players[i].getCard());
 			console.log('Player #' + i + ' use card ' + cards[i] + '[' + this.deck.getCardValue(cards[i]) + ']');
 		}
 
-		for (var i = 0; i < cards.length; i++) {
-			var min = Math.min.apply(null, cards);
-			var ownerIndex = cards.indexOf(min);
+		for (i = 0; i < cards.length; i += 1) {
+			min = Math.min.apply(null, cards);
+			ownerIndex = cards.indexOf(min);
 
 			cards[ownerIndex] = Infinity;
 			this.board.addCard(min, this.players[ownerIndex]);
@@ -96,8 +117,10 @@
 		this.showScore();
 	};
 
-	var game = new SixQuiPrend.Game();
-	for (var i = 0; i < 10; i++) {
+	game = new SixQuiPrend.Game({
+    nbCardsForEachPlayer: 10
+  });
+	for (i = 0; i < 10; i += 1) {
 		game.step();
 	}
-}());
+}(jQuery));

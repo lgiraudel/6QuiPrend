@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>6 qui prend</title>
+	</head>
+	<body>
+    <ul id="players">
+    </ul>
+    <script type="text/template" id="player-tmpl">
+      <li>
+        <dl>
+          <dt>Name</dt><dd>{name}</dd>
+          <dt>Type</dt><dd>{type}</dd>
+        </dl>
+        Cards: {>cards/}
+      </li>
+    </script>
+    <script type="text/tempalte" id="cards-tmpl">
+      <ul>
+        {#cards}
+          <li>
+            {>card/}
+          </li>
+        {/cards}
+      </ul>
+    </script>
+    <script type="text/template" id="card-tmpl">
+      <div class="card">Card value: {value} | Card weight: {weight}</div>
+    </script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/dustjs-linkedin/1.2.0/dust-full.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript" src="js/Board.js"></script>
+		<script type="text/javascript" src="js/Player.js"></script>
+		<script type="text/javascript" src="js/Deck.js"></script>
+		<script type="text/javascript" src="js/Game.js"></script>
+	</body>
+</html>
