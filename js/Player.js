@@ -1,26 +1,26 @@
 /*global jQuery, window, dust, console */
 
 (function ($) {
-	'use strict';
+  'use strict';
 
-	var SixQuiPrend = window.SixQuiPrend = window.SixQuiPrend || {};
+  var SixQuiPrend = window.SixQuiPrend = window.SixQuiPrend || {};
 
-	SixQuiPrend.Player = function (conf) {
-		this.conf = $.extend({
-			cards:   null,
-			index:   null,
+  SixQuiPrend.Player = function (conf) {
+    this.conf = $.extend({
+      cards:   null,
+      index:   null,
       type:    'IA',
       display: true
-		}, conf || {});
+    }, conf || {});
 
-		this.init();
-	};
+    this.init();
+  };
 
-	SixQuiPrend.Player.prototype.init = function () {
+  SixQuiPrend.Player.prototype.init = function () {
     var i,
       output;
 
-		this.score = 0;
+    this.score = 0;
     this.cards = [];
 
     this.templates = {
@@ -45,26 +45,26 @@
         $('#players').append(out);
       });
     }
-	};
+  };
 
-	SixQuiPrend.Player.prototype.getCard = function () {
-		var cardIndex, card;
+  SixQuiPrend.Player.prototype.getCard = function () {
+    var cardIndex, card;
 
-		cardIndex = Math.floor(Math.random() * this.conf.cards.length);
-		card = this.conf.cards.splice(cardIndex, 1);
+    cardIndex = Math.floor(Math.random() * this.conf.cards.length);
+    card = this.conf.cards.splice(cardIndex, 1);
 
-		return card[0];
-	};
+    return card[0];
+  };
 
-	SixQuiPrend.Player.prototype.addPoints = function (cards) {
-		var points = this.conf.deck.getCardsValue(cards);
+  SixQuiPrend.Player.prototype.addPoints = function (cards) {
+    var points = this.conf.deck.getCardsValue(cards);
 
-		console.log('Player #' + this.conf.index + ' add ' + points + ' points');
+    console.log('Player #' + this.conf.index + ' add ' + points + ' points');
 
-		this.score += cards.length;
-	};
+    this.score += cards.length;
+  };
 
-	SixQuiPrend.Player.prototype.getScore = function () {
-		return this.score;
-	};
+  SixQuiPrend.Player.prototype.getScore = function () {
+    return this.score;
+  };
 }(jQuery));
